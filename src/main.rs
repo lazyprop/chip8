@@ -12,7 +12,9 @@ fn main() {
         v: [0; 16],
         stack: [0;16],
         sp: 0,
-        display: disp
+        display: disp,
+        dt: 0,
+        st: 0,
     };
 
     loop {

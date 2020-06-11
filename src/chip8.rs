@@ -1,3 +1,5 @@
+use rand::Rng;
+
 pub struct Cpu {
     pub I: u16,     // index register
     pub pc: u16,    // program counter
@@ -6,6 +8,8 @@ pub struct Cpu {
     pub stack: [u16; 16],
     pub sp: u8, // stack pointer
     pub display: Display,
+    pub dt: u8, // delay timer
+    pub st: u8  // sound timer
 }
 
 impl Cpu {
@@ -23,7 +27,7 @@ impl Cpu {
     fn execute_opcode (&mut self, opcode: u16) {
         // opcode parameters
         let addr = opcode & 0xFFF; // lowest 12 bits
-        let kk = (opcode & 0x0FF) as u8;   // lowset 8 bits
+        let kk = (opcode & 0x0FF) as u8;   // lowest 8 bits
         let n = opcode & 0x00F;    // lowest 4 bits
         let x = ((opcode >> 8) & 0xF0) as usize;    // lower 4 bits of the high byte
         let y = ((opcode >> 4) & 0x0F) as usize;    // higher 4 bits of the low byte
@@ -70,6 +74,7 @@ impl Cpu {
             },
 
             (0x4, _, _, _) => {
+                // SNE Vx, byte
                 self.pc+= if self.v[x] != kk { 2 } else { 0 };
             }
 
@@ -151,6 +156,89 @@ impl Cpu {
                 // SHL Vx {, Vy}
                 self.v[0xF] = self.v[x] & 0x80;
                 self.v[x] <<= 1;
+            },
+
+            (0x9, _, _, 0x0) => {
+                // SNE Vx, Vy
+                self.pc += if self.v[x] != self.v[y] { 2 } else { 0 };
+            },
+
+            (0xA, _, _, _) => {
+                // LD I, addr
+                self.I = addr;
+            },
+
+            (0xB, _, _, _) => {
+                // JP V0, addr
+                self.pc = addr + (self.v[0] as u16);
+            },
+
+            (0xC, _, _, _) => {
+                // RND Vx, byte
+                let mut rng = rand::thread_rng();
+
+                self.v[x] = kk & (rng.gen_range(0,256) as u8);
+            },
+
+            (0xD, _, _, _) => {
+                // DRW Vx, Vy, nibble
+                /* TODO */
+            },
+
+            (0xE, _, 0x9, 0xE) => {
+                // SKP Vx
+                /* TODO */
+            },
+
+            (0xE, _, 0xA, 0x1) => {
+                // SKNP Vx
+                /* TODO */
+            },
+
+           (0xF, _, 0x0, 0x7) => {
+                // LD Vx, DT
+               self.v[x] = self.dt;
+            },
+
+            (0xF, _, 0x0, 0xA) => {
+                // LD Vx, K
+                /* TODO */
+            },
+
+            (0xF, _, 0x1, 0x5) => {
+                // LD DT, Vx
+                self.dt = self.v[x];
+            },
+
+            (0xF, _, 0x1, 0x8) => {
+                // LD ST, Vx
+                self.st = self.v[x];
+            },
+
+            (0xF, _, 0x1, 0xE) => {
+                // ADD I, Vx
+                self.I += self.v[x] as u16;
+            },
+
+            (0xF, _, 0x2, 0x9) => {
+                // LD F, Vx
+                /* TODO */
+            },
+
+            (0xF, _, 0x3, 0x3) => {
+                // LD B, Vx
+                self.memory[self.I as usize] = self.v[x] / 100;
+                self.memory[self.I as usize + 1] = (self.v[x] / 10) % 10;
+                self.memory[self.I as usize + 2] = self.v[x] % 10;
+            },
+
+            (0xF, _, 0x5, 0x5) => {
+                // LD [I], Vx
+            },
+
+            (0xF, _, 0x6, 0x5) => {
+                // LD Vx, [I]
+                /* TODO */
             },
 
             (_, _, _, _) => {
