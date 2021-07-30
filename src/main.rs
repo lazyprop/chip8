@@ -3,7 +3,7 @@ mod cpu;
 mod keypad;
 
 use display::Display;
-use cpu::Cpu;
+use cpu::*;
 use keypad::Keypad;
 
 fn main() {

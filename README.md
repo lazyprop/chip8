@@ -16,3 +16,5 @@
 [Cowgod's Guide](http://devernay.free.fr/hacks/chip8/C8TECH10.HTM#0.1)
 
 [Multigesture's Guide](http://www.multigesture.net/articles/how-to-write-an-emulator-chip-8-interpreter/)
+
+Tests copied from [ScottLogic's implementation](https://github.com/ColinEberhardt/wasm-rust-chip8/blob/master/src/cpu.rs#L222)
