@@ -1,14 +1,12 @@
 # Chip-8 Emulator in Rust
 
 ### TODO
--`DRW` instruction
 - Finish CPU initialization
     * Loading Programs
     * Timer Stuff
 - Do graphics stuff
     * Displaying stuff with Termion
     * Loading of sprites.
-    * Display update using XOR
 - Do keyboard stuff
     * Detect keypresses/releases using Termion
 

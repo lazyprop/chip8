@@ -200,8 +200,11 @@ impl Cpu {
 
             (0xD, _, _, _) => {
                 // DRW Vx, Vy, nibble
-                /* TODO */
-
+                let collision = self.display.draw(self.v[x] as usize,
+                                                  self.v[y] as usize,
+                                                  &self.memory[self.i as usize
+                                                               .. (self.i + n) as u16 as usize]);
+                self.v[0xF] = if collision { 0 } else { 1 };
             },
 
             (0xE, _, 0x9, 0xE) => {
