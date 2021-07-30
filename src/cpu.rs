@@ -18,6 +18,14 @@ pub struct Cpu {
 }
 
 impl Cpu {
+    pub fn load_rom(&mut self, rom: &Vec<u8>) {
+	for (i, byte) in rom.iter().enumerate() {
+	    self.memory[i] = *byte;
+	}
+    }
+}
+
+impl Cpu {
     pub fn new() -> Cpu {
         Cpu {
             i: 0,
@@ -45,6 +53,16 @@ impl Cpu {
         let opcode = self.read_opcode();
 
         self.execute_opcode(opcode);
+
+	if (self.dt > 0) {
+	    self.dt -= 1;
+	}
+	if (self.st > 0) {
+	    if (self.st == 1) {
+		println!("BEEP!");
+	    }
+	    self.st -= 1;
+	}
     }
 
     fn execute_opcode(&mut self, opcode: u16) {
