@@ -16,6 +16,21 @@ pub struct Cpu {
 }
 
 impl Cpu {
+    pub fn new() -> Cpu {
+        Cpu {
+            I: 0,
+            pc: 0x200,
+            memory: [0; 4096],
+            v: [0; 16],
+            stack: [0;16],
+            sp: 0,
+            display: Display::new(),
+            keypad: Keypad::new(),
+            dt: 0,
+            st: 0,
+        }
+    }
+
     pub fn emulate_cycle(&mut self) {
         // read op code
         let opcode = read_opcode(self.memory, self.pc);
