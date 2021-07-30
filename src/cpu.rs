@@ -2,6 +2,8 @@ use rand::Rng;
 use crate::display::Display;
 use crate::keypad::Keypad;
 
+pub const PROGRAM_START: u16 = 0x200;
+
 pub struct Cpu {
     pub i: u16,     // index register
     pub pc: u16,    // program counter
@@ -19,7 +21,7 @@ impl Cpu {
     pub fn new() -> Cpu {
         Cpu {
             i: 0,
-            pc: 0,
+            pc: PROGRAM_START,
             memory: [0; 4096],
             v: [0; 16],
             stack: [0;16],
@@ -287,6 +289,8 @@ impl Cpu {
 #[cfg(test)]
 mod tests {
     use super::Cpu;
+    use super::PROGRAM_START;
+
     #[test]
     fn opcode_jp() {
 	let mut cpu = Cpu::new();
@@ -314,11 +318,11 @@ mod tests {
 
 	// vx == kk
 	cpu.execute_opcode(0x31FE);
-	assert_eq!(cpu.pc, 4, "the stack pointer skips");
+	assert_eq!(cpu.pc, PROGRAM_START + 4, "the stack pointer skips");
 
 	// vx != kk
 	cpu.execute_opcode(0x31FA);
-	assert_eq!(cpu.pc, 6, "the stack pointer is incremented");
+	assert_eq!(cpu.pc, PROGRAM_START + 6, "the stack pointer is incremented");
     }
 
     #[test]
@@ -328,11 +332,11 @@ mod tests {
 
 	// vx == kk
 	cpu.execute_opcode(0x41FE);
-	assert_eq!(cpu.pc, 2, "the stack pointer is incremented");
+	assert_eq!(cpu.pc, PROGRAM_START + 2, "the stack pointer is incremented");
 
 	// vx != kk
 	cpu.execute_opcode(0x41FA);
-	assert_eq!(cpu.pc, 6, "the stack pointer skips");
+	assert_eq!(cpu.pc, PROGRAM_START + 6, "the stack pointer skips");
     }
 
     #[test]
@@ -344,11 +348,11 @@ mod tests {
 
 	// vx == vy
 	cpu.execute_opcode(0x5230);
-	assert_eq!(cpu.pc, 4, "the stack pointer skips");
+	assert_eq!(cpu.pc, PROGRAM_START + 4, "the stack pointer skips");
 
 	// vx != vy
 	cpu.execute_opcode(0x5130);
-	assert_eq!(cpu.pc, 6, "the stack pointer is incremented");
+	assert_eq!(cpu.pc, PROGRAM_START + 6, "the stack pointer is incremented");
     }
 
     #[test]
@@ -360,11 +364,11 @@ mod tests {
 
 	// vx == vy
 	cpu.execute_opcode(0x9230);
-	assert_eq!(cpu.pc, 2, "the stack pointer is incremented");
+	assert_eq!(cpu.pc, PROGRAM_START + 2, "the stack pointer is incremented");
 
 	// vx != vy
 	cpu.execute_opcode(0x9130);
-	assert_eq!(cpu.pc, 6, "the stack pointer skips");
+	assert_eq!(cpu.pc, PROGRAM_START + 6, "the stack pointer skips");
     }
 
     #[test]
@@ -502,15 +506,15 @@ mod tests {
 
 	cpu.execute_opcode(0x61AA);
 	assert_eq!(cpu.v[1], 0xAA, "V1 is set");
-	assert_eq!(cpu.pc, 2, "the program counter is advanced two bytes");
+	assert_eq!(cpu.pc, PROGRAM_START + 2, "the program counter is advanced two bytes");
 
 	cpu.execute_opcode(0x621A);
 	assert_eq!(cpu.v[2], 0x1A, "V2 is set");
-	assert_eq!(cpu.pc, 4, "the program counter is advanced two bytes");
+	assert_eq!(cpu.pc, PROGRAM_START + 4, "the program counter is advanced two bytes");
 
 	cpu.execute_opcode(0x6A15);
 	assert_eq!(cpu.v[10], 0x15, "V10 is set");
-	assert_eq!(cpu.pc, 6, "the program counter is advanced two bytes");
+	assert_eq!(cpu.pc, PROGRAM_START + 6, "the program counter is advanced two bytes");
     }
 
     #[test]
@@ -519,6 +523,6 @@ mod tests {
 	cpu.execute_opcode(0xAFAF);
 
 	assert_eq!(cpu.i, 0x0FAF, "the 'i' register is updated");
-	assert_eq!(cpu.pc, 2, "the program counter is advanced two bytes");
+	assert_eq!(cpu.pc, PROGRAM_START + 2, "the program counter is advanced two bytes");
     }
 }
