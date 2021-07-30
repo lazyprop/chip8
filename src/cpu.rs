@@ -1,4 +1,6 @@
 use rand::Rng;
+use crate::display::Display;
+use crate::keypad::Keypad;
 
 pub struct Cpu {
     pub I: u16,     // index register
@@ -8,6 +10,7 @@ pub struct Cpu {
     pub stack: [u16; 16],
     pub sp: u8, // stack pointer
     pub display: Display,
+    pub keypad: Keypad,
     pub dt: u8, // delay timer
     pub st: u8  // sound timer
 }
@@ -24,11 +27,11 @@ impl Cpu {
         // update counters
     }
 
-    fn execute_opcode (&mut self, opcode: u16) {
+    fn execute_opcode(&mut self, opcode: u16) {
         // opcode parameters
         let addr = opcode & 0xFFF; // lowest 12 bits
         let kk = (opcode & 0x0FF) as u8;   // lowest 8 bits
-        let n = opcode & 0x00F;    // lowest 4 bits
+        let n = opcode & 0x00F;    // lowest 4 bits (nibble)
         let x = ((opcode >> 8) & 0xF0) as usize;    // lower 4 bits of the high byte
         let y = ((opcode >> 4) & 0x0F) as usize;    // higher 4 bits of the low byte
         
@@ -183,16 +186,17 @@ impl Cpu {
             (0xD, _, _, _) => {
                 // DRW Vx, Vy, nibble
                 /* TODO */
+
             },
 
             (0xE, _, 0x9, 0xE) => {
                 // SKP Vx
-                /* TODO */
+                self.pc += if self.keypad.is_pressed(self.v[x]) { 2 } else { 0 };
             },
 
             (0xE, _, 0xA, 0x1) => {
                 // SKNP Vx
-                /* TODO */
+                self.pc += if !self.keypad.is_pressed(self.v[x]) { 2 } else { 0 };
             },
 
            (0xF, _, 0x0, 0x7) => {
@@ -202,7 +206,13 @@ impl Cpu {
 
             (0xF, _, 0x0, 0xA) => {
                 // LD Vx, K
-                /* TODO */
+                self.pc -= 2;
+                for (i, key) in self.keypad.keys.iter().enumerate() {
+                    if *key {
+                        self.v[x] = i as u8;
+                        self.pc += 2;
+                    }
+                }
             },
 
             (0xF, _, 0x1, 0x5) => {
@@ -222,7 +232,7 @@ impl Cpu {
 
             (0xF, _, 0x2, 0x9) => {
                 // LD F, Vx
-                /* TODO */
+                self.I = self.v[x] as u16 * 5;
             },
 
             (0xF, _, 0x3, 0x3) => {
@@ -234,11 +244,16 @@ impl Cpu {
 
             (0xF, _, 0x5, 0x5) => {
                 // LD [I], Vx
+                for i in 0..x {
+                    self.memory[self.I as usize + i] = self.v[i];
+                }
             },
 
             (0xF, _, 0x6, 0x5) => {
                 // LD Vx, [I]
-                /* TODO */
+                for i in 0..x {
+                    self.v[i] = self.memory[self.I as usize + i];
+                }
             },
 
             (_, _, _, _) => {
@@ -249,18 +264,8 @@ impl Cpu {
 }
 
 fn read_opcode(memory: [u8; 4096], pc: u16) -> u16 {
-    // read a 16bit word from ram
+    // read a 16 bit word from ram
     let opcode: u16 = (memory[pc as usize] as u16) << 8 | 
         (memory[pc as usize + 1] as u16);
     opcode
-}
-
-pub struct Display {
-    pub d:  bool,
-}
-
-impl Display {
-    pub fn cls(&mut self) {
-        self.d = false;
-    }
 }

@@ -1,7 +1,7 @@
 # Chip-8 Emulator in Rust
 
 ### TODO
-- Complete leftover instructions
+- Implement `Display` struct and `DRW` instruction
 - Finish CPU initialization
     * Loading Programs
     * Timer Stuff
