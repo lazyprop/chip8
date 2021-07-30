@@ -7,9 +7,7 @@ use cpu::Cpu;
 use keypad::Keypad;
 
 fn main() {
-    let display = Display {
-        d: true
-    };
+    let display = Display::new();
     let keypad = Keypad {
         keys: [false; 16]
     };
