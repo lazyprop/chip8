@@ -12,3 +12,4 @@
   [Skosulor/c8int](https://github.com/Skosulor/c8int/tree/master/test).
   final instruction `0x13a8` or `JP 0x03a8` is at `0x03a8` hence goes into
   infinite loop.
+- `Sierpinski.ch8` copied from [here](https://github.com/dmatlack/chip8/blob/master/roms/demos/Sierpinski%20%5BSergey%20Naydenov%2C%202010%5D.ch8).

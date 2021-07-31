@@ -1,4 +1,4 @@
-use crate::display::Display;
+use crate::display::{Display, FONT_SET};
 use crate::keypad::Keypad;
 use rand::Rng;
 
@@ -19,6 +19,14 @@ pub struct Cpu {
 
 impl Cpu {
     pub fn load_rom(&mut self, rom: &Vec<u8>) {
+        let mut count = 0;
+        for sprite in FONT_SET {
+            for byte in sprite {
+                self.memory[count] = byte;
+                count += 1;
+            }
+        }
+
         for (i, byte) in rom.iter().enumerate() {
             self.memory[PROGRAM_START as usize + i] = *byte;
         }
@@ -235,7 +243,7 @@ impl Cpu {
                     self.v[y] as usize,
                     &self.memory[self.i as usize..(self.i + n) as u16 as usize],
                 );
-                self.v[0xF] = if collision { 0 } else { 1 };
+                self.v[0xF] = if collision { 1 } else { 0 };
             }
 
             (0xE, _, 0x9, 0xE) => {

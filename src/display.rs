@@ -1,22 +1,28 @@
-const WIDTH: usize = 64;
-const HEIGHT: usize = 32;
+pub const WIDTH: usize = 64;
+pub const HEIGHT: usize = 32;
 
 pub struct Display {
-    pub memory: [[u8; WIDTH]; HEIGHT],
+    pub memory: [u32; WIDTH * HEIGHT],
 }
 
 impl Display {
     pub fn new() -> Display {
         Display {
-            memory: [[0; WIDTH]; HEIGHT],
+            memory: [0; WIDTH * HEIGHT],
         }
     }
 
+    pub fn get_pixel(&self, x: usize, y: usize) -> bool {
+        self.memory[x + WIDTH * y] == 1
+    }
+
+    pub fn set_pixel(&mut self, x: usize, y: usize, val: bool) {
+        self.memory[x + WIDTH * y] = val as u32;
+    }
+
     pub fn cls(&mut self) {
-        for mut row in self.memory {
-            for mut cell in row {
-                cell = 0;
-            }
+        for mut cell in self.memory {
+            cell = 0;
         }
     }
 
@@ -29,11 +35,11 @@ impl Display {
                 if new_value == 1 {
                     let xi = (x + i) % WIDTH;
                     let yj = (y + j) % HEIGHT;
-                    let old_value = self.memory[xi][yj] == 1;
+                    let old_value = self.get_pixel(xi, yj);
                     if old_value {
                         collision = true;
                     }
-                    self.memory[xi][yj] = ((new_value == 1) ^ old_value) as u8;
+                    self.set_pixel(xi, yj, (new_value == 1) ^ old_value);
                 }
             }
         }
