@@ -18,9 +18,9 @@ pub struct Cpu {
 }
 
 impl Cpu {
-    pub fn load_rom(&mut self, rom: &[u8]) {
+    pub fn load_rom(&mut self, rom: &Vec<u8>) {
         for (i, byte) in rom.iter().enumerate() {
-            self.memory[i] = *byte;
+            self.memory[PROGRAM_START as usize + i] = *byte;
         }
     }
 }
@@ -51,6 +51,7 @@ impl Cpu {
     pub fn emulate_cycle(&mut self) {
         // read op code
         let opcode = self.read_opcode();
+        println!("executing opcode {:#06x}", opcode);
 
         self.execute_opcode(opcode);
 
@@ -100,7 +101,6 @@ impl Cpu {
 
             (0x2, _, _, _) => {
                 // CALL addr
-
                 /*
                    1. increment stack pointer
                    2. put current pc on top of the stack
@@ -133,7 +133,12 @@ impl Cpu {
 
             (0x7, _, _, _) => {
                 // ADD Vx, byte
-                self.v[x] += byte;
+                let (sum, overflow) = self.v[x].overflowing_add(byte);
+                match overflow {
+                    true => self.v[0xF] = 1,
+                    false => self.v[0xF] = 0,
+                }
+                self.v[x] = sum;
             }
 
             (0x8, _, _, 0x0) => {

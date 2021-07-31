@@ -13,9 +13,9 @@ impl Display {
     }
 
     pub fn cls(&mut self) {
-        for x in 0..WIDTH {
-            for y in 0..HEIGHT {
-                self.memory[x][y] = 0;
+        for mut row in self.memory {
+            for mut cell in row {
+                cell = 0;
             }
         }
     }
