@@ -18,7 +18,7 @@ pub struct Cpu {
 }
 
 impl Cpu {
-    pub fn load_rom(&mut self, rom: &Vec<u8>) {
+    pub fn load_rom(&mut self, rom: &[u8]) {
         for (i, byte) in rom.iter().enumerate() {
             self.memory[i] = *byte;
         }
@@ -54,11 +54,11 @@ impl Cpu {
 
         self.execute_opcode(opcode);
 
-        if (self.dt > 0) {
+        if self.dt > 0 {
             self.dt -= 1;
         }
-        if (self.st > 0) {
-            if (self.st == 1) {
+        if self.st > 0 {
+            if self.st == 1 {
                 println!("BEEP!");
             }
             self.st -= 1;
@@ -143,17 +143,17 @@ impl Cpu {
 
             (0x8, _, _, 0x1) => {
                 // OR Vx, Vy
-                self.v[x] = self.v[x] | self.v[y];
+                self.v[x] |= self.v[y];
             }
 
             (0x8, _, _, 0x2) => {
                 // AND Vx, Vy
-                self.v[x] = self.v[x] & self.v[y];
+                self.v[x] &= self.v[y];
             }
 
             (0x8, _, _, 0x3) => {
                 // XOR Vx, Vy
-                self.v[x] = self.v[x] ^ self.v[y];
+                self.v[x] ^= self.v[y];
             }
 
             (0x8, _, _, 0x4) => {

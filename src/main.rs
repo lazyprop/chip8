@@ -7,9 +7,9 @@ use display::Display;
 use keypad::Keypad;
 
 fn main() {
-    let mut CPU = Cpu::new();
+    let mut cpu = Cpu::new();
 
     loop {
-        CPU.emulate_cycle(); // emulate one cycle
+        cpu.emulate_cycle(); // emulate one cycle
     }
 }
