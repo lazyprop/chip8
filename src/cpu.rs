@@ -68,7 +68,7 @@ impl Cpu {
     fn execute_opcode(&mut self, opcode: u16) {
         // opcode parameters
         let addr = opcode & 0xFFF; // lowest 12 bits
-        let kk = (opcode & 0x0FF) as u8; // lowest 8 bits
+        let byte = (opcode & 0x0FF) as u8; // lowest 8 bits
         let n = opcode & 0x00F; // lowest 4 bits (nibble)
         let x = ((opcode & 0x0F00) >> 8) as usize; // lower 4 bits of the high byte
         let y = ((opcode & 0x00F0) >> 4) as usize; // higher 4 bits of the low byte
@@ -113,12 +113,12 @@ impl Cpu {
 
             (0x3, _, _, _) => {
                 // SE Vx byte
-                self.pc += if self.v[x] == kk { 2 } else { 0 };
+                self.pc += if self.v[x] == byte { 2 } else { 0 };
             }
 
             (0x4, _, _, _) => {
                 // SNE Vx, byte
-                self.pc += if self.v[x] != kk { 2 } else { 0 };
+                self.pc += if self.v[x] != byte { 2 } else { 0 };
             }
 
             (0x5, _, _, 0x0) => {
@@ -128,12 +128,12 @@ impl Cpu {
 
             (0x6, _, _, _) => {
                 // LD Vx, byte
-                self.v[x] = kk;
+                self.v[x] = byte;
             }
 
             (0x7, _, _, _) => {
                 // ADD Vx, byte
-                self.v[x] += kk;
+                self.v[x] += byte;
             }
 
             (0x8, _, _, 0x0) => {
@@ -220,7 +220,7 @@ impl Cpu {
                 // RND Vx, byte
                 let mut rng = rand::thread_rng();
 
-                self.v[x] = kk & (rng.gen_range(0, 256) as u8);
+                self.v[x] = byte & (rng.gen_range(0, 256) as u8);
             }
 
             (0xD, _, _, _) => {
@@ -350,11 +350,11 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.v[1] = 0xFE;
 
-        // vx == kk
+        // vx == byte
         cpu.execute_opcode(0x31FE);
         assert_eq!(cpu.pc, PROGRAM_START + 4, "the stack pointer skips");
 
-        // vx != kk
+        // vx != byte
         cpu.execute_opcode(0x31FA);
         assert_eq!(
             cpu.pc,
@@ -368,7 +368,7 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.v[1] = 0xFE;
 
-        // vx == kk
+        // vx == byte
         cpu.execute_opcode(0x41FE);
         assert_eq!(
             cpu.pc,
@@ -376,7 +376,7 @@ mod tests {
             "the stack pointer is incremented"
         );
 
-        // vx != kk
+        // vx != byte
         cpu.execute_opcode(0x41FA);
         assert_eq!(cpu.pc, PROGRAM_START + 6, "the stack pointer skips");
     }
@@ -422,7 +422,7 @@ mod tests {
     }
 
     #[test]
-    fn opcode_add_vx_kkk() {
+    fn opcode_add_vx_byte() {
         let mut cpu = Cpu::new();
         cpu.v[1] = 3;
 
