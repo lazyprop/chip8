@@ -1,7 +1,7 @@
 # Chip-8 Emulator in Rust
 
 ### TODO
-- Implement an interface using some 2D game library.
+- Deal with keyboard input.
 
 ### Resources
 - [Opcode Table](https://en.wikipedia.org/wiki/CHIP-8#Opcode_table)
