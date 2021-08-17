@@ -1,5 +1,7 @@
 pub const WIDTH: usize = 64;
 pub const HEIGHT: usize = 32;
+pub const ON: u32 = 0xffffffff;
+pub const OFF: u32 = 0x00000000;
 
 pub struct Display {
     pub memory: [u32; WIDTH * HEIGHT],
@@ -13,11 +15,11 @@ impl Display {
     }
 
     pub fn get_pixel(&self, x: usize, y: usize) -> bool {
-        self.memory[x + WIDTH * y] == 1
+        self.memory[x + WIDTH * y] == ON
     }
 
     pub fn set_pixel(&mut self, x: usize, y: usize, val: bool) {
-        self.memory[x + WIDTH * y] = val as u32;
+        self.memory[x + WIDTH * y] = if val { ON } else { OFF };
     }
 
     pub fn cls(&mut self) {
