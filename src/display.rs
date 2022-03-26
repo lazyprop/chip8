@@ -23,8 +23,8 @@ impl Display {
     }
 
     pub fn cls(&mut self) {
-        for mut cell in self.memory {
-            cell = 0;
+        for mut _cell in self.memory {
+            _cell = 0;
         }
     }
 
@@ -34,15 +34,14 @@ impl Display {
         for (j, row) in sprite.iter().enumerate() {
             for i in 0..8 {
                 let new_value = row >> (7 - i) & 0x01;
-                if new_value == 1 {
-                    let xi = (x + i) % WIDTH;
-                    let yj = (y + j) % HEIGHT;
-                    let old_value = self.get_pixel(xi, yj);
-                    if old_value {
-                        collision = true;
-                    }
-                    self.set_pixel(xi, yj, (new_value == 1) ^ old_value);
+                if new_value != 1 { continue }
+                let xi = (x + i) % WIDTH;
+                let yj = (y + j) % HEIGHT;
+                let old_value = self.get_pixel(xi, yj);
+                if old_value {
+                    collision = true;
                 }
+                self.set_pixel(xi, yj, (new_value == 1) ^ old_value);
             }
         }
 
