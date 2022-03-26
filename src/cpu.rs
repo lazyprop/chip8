@@ -63,15 +63,9 @@ impl Cpu {
 
         self.execute_opcode(opcode);
 
-        if self.dt > 0 {
-            self.dt -= 1;
-        }
-        if self.st > 0 {
-            if self.st == 1 {
-                println!("BEEP!");
-            }
-            self.st -= 1;
-        }
+        if self.dt > 0 { self.dt -= 1; }
+        if self.st == 1 { println!("BEEP!"); }
+        if self.st > 0 { self.st -= 1; }
     }
 
     fn execute_opcode(&mut self, opcode: u16) {
